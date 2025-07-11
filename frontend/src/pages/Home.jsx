@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Form from "../components/components1/Form";
 import ProfileCard from "../components/components1/ProfileCard";
-import { getAllProfiles } from "../utils/profileStorage";
 
 const Home = () => {
   const [name, setName] = useState("");
@@ -44,9 +43,24 @@ const Home = () => {
   }, [name, bio, techStack, github, linkedin, portfolio, profileImage]);
 
   useEffect(() => {
-    const profiles = getAllProfiles();
-    setSavedProfiles(profiles);
+    const fetchProfiles = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/form/profiles");
+        const data = await res.json();
+  
+        if (data.success) {
+          setSavedProfiles(data.data); // data.data contains array of profiles
+        } else {
+          console.error("Failed to fetch profiles");
+        }
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    };
+  
+    fetchProfiles();
   }, []);
+  
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

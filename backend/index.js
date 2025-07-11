@@ -11,7 +11,7 @@ const app = express();
 
 // Middlewares
 app.use(cors()); //allow request from frontend 
-app.use(express.json()); //parse JSON body
+app.use(express.json({ limit: "10mb" })); //parse JSON body
 
 // Connect MongoDB
 connectDB();

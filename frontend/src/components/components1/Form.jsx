@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   deleteProfileById,
   getAllProfiles,
-  getProfileById,
-  saveProfile,
 } from "../../utils/profileStorage";
 
 // Tech stack options
@@ -128,31 +126,44 @@ const Form = ({
   
 
   // ✅ Unified load + select logic
-  const handleSelectProfile = (e) => {
+  const handleSelectProfile = async (e) => {
     const selectedId = e.target.value;
-    setSelectedProfileId(selectedId);
-
-    const selectedProfile = getProfileById(selectedId);
-    if (!selectedProfile) return;
-
-    const {
-      name: savedName,
-      bio: savedBio,
-      github: savedGithub,
-      linkedin: savedLinkedin,
-      portfolio: savedPortfolio,
-      techStack: savedTechStack,
-      profileImage: savedProfileImage,
-    } = selectedProfile.data;
-
-    setName(savedName || "");
-    setBio(savedBio || "");
-    setGithub(savedGithub || "");
-    setLinkedin(savedLinkedin || "");
-    setPortfolio(savedPortfolio || "");
-    setTechStack(savedTechStack || []);
-    setProfileImage(savedProfileImage || null);
+    if (!selectedId) return;
+  
+    try {
+      const res = await fetch(`http://localhost:5000/api/form/${selectedId}`);
+      const data = await res.json();
+  
+      if (!res.ok) {
+        alert("❌ Failed to fetch profile");
+        return;
+      }
+  
+      const {
+        name: savedName,
+        bio: savedBio,
+        github: savedGithub,
+        linkedin: savedLinkedin,
+        portfolio: savedPortfolio,
+        techStack: savedTechStack,
+        profileImage: savedProfileImage,
+      } = data;
+  
+      setName(savedName || "");
+      setBio(savedBio || "");
+      setGithub(savedGithub || "");
+      setLinkedin(savedLinkedin || "");
+      setPortfolio(savedPortfolio || "");
+      setTechStack(savedTechStack || []);
+      setProfileImage(savedProfileImage || "");
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      alert("Server error while loading profile");
+    }
   };
+  
+  
+  
 
   // ✅ Delete selected profile
   const handleDeleteProfile = () => {
@@ -200,7 +211,7 @@ const Form = ({
               -- Select a Profile --
             </option>
             {savedProfiles.map((profile) => (
-              <option key={profile.id} value={profile.id}>
+              <option key={profile._id} value={profile._id}>
                 {profile.name}
               </option>
             ))}
