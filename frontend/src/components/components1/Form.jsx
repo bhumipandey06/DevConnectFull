@@ -72,7 +72,6 @@ const Form = ({
 
   // ✅ Save new profile
   const handleSaveProfile = async () => {
-    // 🔸 Frontend validation
     if (!name.trim()) {
       setError("Name is required.");
       return;
@@ -81,12 +80,17 @@ const Form = ({
       setError("GitHub link must start with https://");
       return;
     }
-  
-    setError(""); // clear previous error
-  
-    const profileName = prompt("Enter a name for this profile:");
-    if (!profileName) return;
-  
+    if (linkedin && !linkedin.startsWith("https://")) {
+      setError("Linkedin link must start with https://");
+      return;
+    }
+    if (portfolio && !portfolio.startsWith("https://")) {
+      setError("Portfolio link must start with https://");
+      return;
+    }
+
+    setError(""); // Clear errors
+
     const profileData = {
       name,
       bio,
@@ -96,7 +100,93 @@ const Form = ({
       techStack,
       profileImage,
     };
-  
+
+    try {
+      if (selectedProfileId) {
+        // 🔄 Update existing profile
+        const response = await fetch(
+          `http://localhost:5000/api/form/${selectedProfileId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(profileData),
+          }
+        );
+        const result = await response.json();
+        if (result.success) {
+          alert("✅ Profile updated successfully!");
+        } else {
+          alert("⚠️ Failed to update profile.");
+        }
+      } else {
+        // ➕ Create new profile
+        const profileName = prompt("Enter a name for this profile:");
+        if (!profileName) return;
+
+        profileData.name = profileName;
+
+        const response = await fetch("http://localhost:5000/api/form/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(profileData),
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert("✅ Profile saved successfully!");
+        } else {
+          alert("⚠️ Failed to save profile.");
+        }
+      }
+
+      // 🔄 Refresh saved profiles
+      const updatedProfilesResponse = await fetch(
+        "http://localhost:5000/api/form/profiles"
+      );
+      const updated = await updatedProfilesResponse.json();
+      if (updated.success) {
+        setSavedProfiles(updated.data);
+      }
+    } catch (err) {
+      console.error("Save error:", err.message);
+      alert("❌ An error occurred while saving the profile.");
+    }
+  };
+
+  // create new profile
+  const handleSaveAsNew = async () => {
+    const newName = prompt("Enter a new name for this profile:");
+    if (!newName) return;
+    if (!name.trim()) {
+      setError("Name is required.");
+      return;
+    }
+    if (github && !github.startsWith("https://")) {
+      setError("GitHub link must start with https://");
+      return;
+    }
+    if (linkedin && !linkedin.startsWith("https://")) {
+      setError("Linkedin link must start with https://");
+      return;
+    }
+    if (portfolio && !portfolio.startsWith("https://")) {
+      setError("Portfolio link must start with https://");
+      return;
+    }
+
+    const profileData = {
+      name: newName, // overwrite name with new one
+      bio,
+      github,
+      linkedin,
+      portfolio,
+      techStack,
+      profileImage,
+    };
+
     try {
       const response = await fetch("http://localhost:5000/api/form/submit", {
         method: "POST",
@@ -105,31 +195,37 @@ const Form = ({
         },
         body: JSON.stringify(profileData),
       });
-  
+
       const result = await response.json();
-      console.log("✅ Backend response:", result);
-  
-      // Optional: If still using localStorage temporarily
-      // saveProfile(profileName, profileData);
-      // setSavedProfiles(getAllProfiles());
-  
-      alert("✅ Profile sent to backend!");
-    } catch (error) {
-      console.error("❌ Error submitting profile:", error);
-      alert("Failed to save profile. Please try again.");
+      if (result.success) {
+        alert("✅ Profile saved as new successfully!");
+
+        // Refresh saved profiles
+        const updatedProfiles = await fetch(
+          "http://localhost:5000/api/form/profiles"
+        );
+        const data = await updatedProfiles.json();
+        if (data.success) {
+          setSavedProfiles(data.data);
+        }
+      } else {
+        alert("❌ Failed to save new profile.");
+      }
+    } catch (err) {
+      console.error("Save as new error:", err.message);
+      alert("❌ Error saving new profile.");
     }
   };
-  
 
   // ✅ Unified load + select logic
   const handleSelectProfile = (e) => {
     const selectedId = e.target.value;
     setSelectedProfileId(selectedId); // set this for deletion too
     if (!selectedId) return;
-  
+
     const selectedProfile = savedProfiles.find((p) => p._id === selectedId);
     if (!selectedProfile) return;
-  
+
     const {
       name: savedName,
       bio: savedBio,
@@ -139,7 +235,7 @@ const Form = ({
       techStack: savedTechStack,
       profileImage: savedProfileImage,
     } = selectedProfile;
-  
+
     setName(savedName || "");
     setBio(savedBio || "");
     setGithub(savedGithub || "");
@@ -148,33 +244,39 @@ const Form = ({
     setTechStack(savedTechStack || []);
     setProfileImage(savedProfileImage || "");
   };
-  
 
   // ✅ Delete selected profile
   const handleDeleteProfile = async () => {
     if (!selectedProfileId) return;
-  
-    const confirmDelete = window.confirm("Are you sure you want to delete this profile?");
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this profile?"
+    );
     if (!confirmDelete) return;
-  
+
     try {
-      const res = await fetch(`http://localhost:5000/api/form/${selectedProfileId}`, {
-        method: "DELETE",
-      });
-  
+      const res = await fetch(
+        `http://localhost:5000/api/form/${selectedProfileId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
       const result = await res.json(); // ✅ Safe now
-  
+
       if (!res.ok) {
         throw new Error(result.message || "Failed to delete");
       }
-  
+
       alert("🗑️ Profile deleted successfully!");
-  
+
       // Refresh list
-      const updatedProfilesRes = await fetch("http://localhost:5000/api/form/profiles");
+      const updatedProfilesRes = await fetch(
+        "http://localhost:5000/api/form/profiles"
+      );
       const updatedData = await updatedProfilesRes.json();
       setSavedProfiles(updatedData.data);
-  
+
       // Reset form
       setSelectedProfileId("");
       setName("");
@@ -184,15 +286,11 @@ const Form = ({
       setPortfolio("");
       setTechStack([]);
       setProfileImage("");
-  
     } catch (err) {
       console.error("Delete error:", err.message);
       alert("❌ Failed to delete profile.");
     }
   };
-  
-  
-  
 
   return (
     <form
@@ -337,10 +435,10 @@ const Form = ({
       <div className="flex flex-col sm:flex-row gap-3 mt-4">
         <button
           type="button"
-          onClick={() => navigate("/profile")}
+          onClick={() => navigate(`/profile/${selectedProfileId}`)}
           className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
         >
-          View My Public Profile
+          View My Profile
         </button>
 
         <button
@@ -349,6 +447,14 @@ const Form = ({
           className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
         >
           Save Profile
+        </button>
+
+        <button
+          type="button"
+          onClick={handleSaveAsNew}
+          className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
+        >
+          Save New Profile
         </button>
 
         <button

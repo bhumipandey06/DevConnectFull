@@ -77,5 +77,24 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// PUT /api/form/:id - update a profile by ID
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedProfile = await Profile.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    if (!updatedProfile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    res.status(200).json({ success: true, data: updatedProfile });
+  } catch (err) {
+    console.error("Error updating profile:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 module.exports = router;
