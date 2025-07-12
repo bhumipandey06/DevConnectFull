@@ -7,6 +7,7 @@ const formRoutes = require("./routes/formRoutes");
 
 
 dotenv.config(); //load env variables
+const PORT = process.env.PORT;
 const app = express();
 
 // Middlewares
@@ -24,7 +25,6 @@ app.get("/", (req, res) => {
 app.use("/api/form", formRoutes);
 
 // Start server
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

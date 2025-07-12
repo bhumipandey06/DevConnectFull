@@ -1,9 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  deleteProfileById,
-  getAllProfiles,
-} from "../../utils/profileStorage";
 
 // Tech stack options
 const techOptions = {
@@ -126,70 +122,77 @@ const Form = ({
   
 
   // ✅ Unified load + select logic
-  const handleSelectProfile = async (e) => {
+  const handleSelectProfile = (e) => {
     const selectedId = e.target.value;
+    setSelectedProfileId(selectedId); // set this for deletion too
     if (!selectedId) return;
   
+    const selectedProfile = savedProfiles.find((p) => p._id === selectedId);
+    if (!selectedProfile) return;
+  
+    const {
+      name: savedName,
+      bio: savedBio,
+      github: savedGithub,
+      linkedin: savedLinkedin,
+      portfolio: savedPortfolio,
+      techStack: savedTechStack,
+      profileImage: savedProfileImage,
+    } = selectedProfile;
+  
+    setName(savedName || "");
+    setBio(savedBio || "");
+    setGithub(savedGithub || "");
+    setLinkedin(savedLinkedin || "");
+    setPortfolio(savedPortfolio || "");
+    setTechStack(savedTechStack || []);
+    setProfileImage(savedProfileImage || "");
+  };
+  
+
+  // ✅ Delete selected profile
+  const handleDeleteProfile = async () => {
+    if (!selectedProfileId) return;
+  
+    const confirmDelete = window.confirm("Are you sure you want to delete this profile?");
+    if (!confirmDelete) return;
+  
     try {
-      const res = await fetch(`http://localhost:5000/api/form/${selectedId}`);
-      const data = await res.json();
+      const res = await fetch(`http://localhost:5000/api/form/${selectedProfileId}`, {
+        method: "DELETE",
+      });
+  
+      const result = await res.json(); // ✅ Safe now
   
       if (!res.ok) {
-        alert("❌ Failed to fetch profile");
-        return;
+        throw new Error(result.message || "Failed to delete");
       }
   
-      const {
-        name: savedName,
-        bio: savedBio,
-        github: savedGithub,
-        linkedin: savedLinkedin,
-        portfolio: savedPortfolio,
-        techStack: savedTechStack,
-        profileImage: savedProfileImage,
-      } = data;
+      alert("🗑️ Profile deleted successfully!");
   
-      setName(savedName || "");
-      setBio(savedBio || "");
-      setGithub(savedGithub || "");
-      setLinkedin(savedLinkedin || "");
-      setPortfolio(savedPortfolio || "");
-      setTechStack(savedTechStack || []);
-      setProfileImage(savedProfileImage || "");
-    } catch (error) {
-      console.error("Error loading profile:", error);
-      alert("Server error while loading profile");
+      // Refresh list
+      const updatedProfilesRes = await fetch("http://localhost:5000/api/form/profiles");
+      const updatedData = await updatedProfilesRes.json();
+      setSavedProfiles(updatedData.data);
+  
+      // Reset form
+      setSelectedProfileId("");
+      setName("");
+      setBio("");
+      setGithub("");
+      setLinkedin("");
+      setPortfolio("");
+      setTechStack([]);
+      setProfileImage("");
+  
+    } catch (err) {
+      console.error("Delete error:", err.message);
+      alert("❌ Failed to delete profile.");
     }
   };
   
   
   
-
-  // ✅ Delete selected profile
-  const handleDeleteProfile = () => {
-    if (!selectedProfileId) return;
-
-    const confirmDelete = confirm(
-      "Are you sure you want to delete this profile?"
-    );
-    if (!confirmDelete) return;
-
-    deleteProfileById(selectedProfileId);
-    const updatedProfiles = getAllProfiles();
-    setSavedProfiles(updatedProfiles);
-    setSelectedProfileId("");
-
-    // Optional: Clear form
-    setName("");
-    setBio("");
-    setGithub("");
-    setLinkedin("");
-    setPortfolio("");
-    setTechStack([]);
-    setProfileImage(null);
-
-    alert("🗑️ Profile deleted successfully!");
-  };
 
   return (
     <form
