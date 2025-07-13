@@ -20,7 +20,7 @@ const Header = () => {
 
         <Link
           to="/profiles"
-          className="text-green-600 dark:text-green-300 font-medium hover:underline"
+          className="text-zinc-800 dark:text-white hover:underline"
         >
           Explore Profiles
         </Link>

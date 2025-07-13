@@ -435,7 +435,14 @@ const Form = ({
       <div className="flex flex-col sm:flex-row gap-3 mt-4">
         <button
           type="button"
-          onClick={() => navigate(`/profile/${selectedProfileId}`)}
+          onClick={() => {
+            if (!selectedProfileId) {
+              alert("Please select or save a profile first.");
+              return;
+            }
+            navigate(`/profile/${selectedProfileId}`);
+          }}
+          disabled={!selectedProfileId}
           className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
         >
           View My Profile
