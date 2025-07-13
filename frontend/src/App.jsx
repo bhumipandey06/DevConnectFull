@@ -2,7 +2,6 @@ import "./App.css";
 import Header from "./components/components1/Header";
 import Footer from "./components/components1/Footer";
 import { Route, Routes } from "react-router-dom";
-import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import ProfileDetails from "./pages/ProfileDetails";
 import AllProfiles from "./pages/AllProfiles";
