@@ -1,12 +1,32 @@
-// src/components/Header.jsx
-import { Sun, Moon } from "lucide-react";
+import { Link } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
   return (
-    <header className="flex items-center justify-between px-6 py-4 shadow-md bg-white dark:bg-zinc-900">
-      <h1 className="text-xl font-bold text-zinc-800 dark:text-white">DevConnect</h1>
-      <ThemeToggle />
+    <header className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 shadow-md bg-white dark:bg-zinc-900">
+      {/* Logo or Title */}
+      <h1 className="text-xl font-bold text-zinc-800 dark:text-white mb-2 sm:mb-0">
+        DevConnect
+      </h1>
+
+      {/* Navigation Links */}
+      <nav className="flex items-center gap-6 text-sm sm:text-base">
+        <Link
+          to="/"
+          className="text-zinc-800 dark:text-white hover:underline"
+        >
+          Home
+        </Link>
+
+        <Link
+          to="/profiles"
+          className="text-green-600 dark:text-green-300 font-medium hover:underline"
+        >
+          Explore Profiles
+        </Link>
+
+        <ThemeToggle />
+      </nav>
     </header>
   );
 };

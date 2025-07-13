@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import ProfileDetails from "./pages/ProfileDetails";
-
+import AllProfiles from "./pages/AllProfiles";
 
 function App() {
   return (
@@ -15,8 +15,9 @@ function App() {
       <main className="flex-1 px-4 py-6 max-w-6xl mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
+          {/* <Route path="/profile" element={<Profile />} /> */}
           <Route path="/profile/:id" element={<ProfileDetails />} />
+          <Route path="/profiles" element={<AllProfiles />} />
         </Routes>
       </main>
 
