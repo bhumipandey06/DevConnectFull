@@ -17,6 +17,11 @@ const profileSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  label: {
+    type: String,
+    required: false, // ← change this
+    default: "",     // ← optional
+  },
 });
 
 const Profile = mongoose.model("Profile", profileSchema);

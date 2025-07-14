@@ -88,9 +88,9 @@ const Form = ({
       setError("Portfolio link must start with https://");
       return;
     }
-
+  
     setError(""); // Clear errors
-
+  
     const profileData = {
       name,
       bio,
@@ -100,10 +100,10 @@ const Form = ({
       techStack,
       profileImage,
     };
-
+  
     try {
       if (selectedProfileId) {
-        // 🔄 Update existing profile
+        // 🔄 Update existing profile (NO PROMPT)
         const response = await fetch(
           `http://localhost:5000/api/form/${selectedProfileId}`,
           {
@@ -121,27 +121,11 @@ const Form = ({
           alert("⚠️ Failed to update profile.");
         }
       } else {
-        // ➕ Create new profile
-        const profileName = prompt("Enter a name for this profile:");
-        if (!profileName) return;
-
-        profileData.name = profileName;
-
-        const response = await fetch("http://localhost:5000/api/form/submit", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(profileData),
-        });
-        const result = await response.json();
-        if (result.success) {
-          alert("✅ Profile saved successfully!");
-        } else {
-          alert("⚠️ Failed to save profile.");
-        }
+        // ➕ Create new profile — this should not be reached if you're always selecting
+        alert("❌ Please use 'Save New Profile' to create a new profile.");
+        return;
       }
-
+  
       // 🔄 Refresh saved profiles
       const updatedProfilesResponse = await fetch(
         "http://localhost:5000/api/form/profiles"
@@ -155,11 +139,13 @@ const Form = ({
       alert("❌ An error occurred while saving the profile.");
     }
   };
+  
 
   // create new profile
   const handleSaveAsNew = async () => {
-    const newName = prompt("Enter a new name for this profile:");
-    if (!newName) return;
+    const profileLabel = prompt("Enter a name for this saved profile:");
+    if (!profileLabel) return;
+  
     if (!name.trim()) {
       setError("Name is required.");
       return;
@@ -176,17 +162,18 @@ const Form = ({
       setError("Portfolio link must start with https://");
       return;
     }
-
+  
     const profileData = {
-      name: newName, // overwrite name with new one
+      name,          // ✅ full name of user
       bio,
       github,
       linkedin,
       portfolio,
       techStack,
       profileImage,
+      label: profileLabel,  // ✅ label shown in dropdown
     };
-
+  
     try {
       const response = await fetch("http://localhost:5000/api/form/submit", {
         method: "POST",
@@ -195,11 +182,11 @@ const Form = ({
         },
         body: JSON.stringify(profileData),
       });
-
+  
       const result = await response.json();
       if (result.success) {
         alert("✅ Profile saved as new successfully!");
-
+  
         // Refresh saved profiles
         const updatedProfiles = await fetch(
           "http://localhost:5000/api/form/profiles"
@@ -216,6 +203,7 @@ const Form = ({
       alert("❌ Error saving new profile.");
     }
   };
+  
 
   // ✅ Unified load + select logic
   const handleSelectProfile = (e) => {
@@ -313,8 +301,8 @@ const Form = ({
             </option>
             {savedProfiles.map((profile) => (
               <option key={profile._id} value={profile._id}>
-                {profile.name}
-              </option>
+              {profile.label || profile.name}
+            </option>
             ))}
           </select>
 

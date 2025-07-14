@@ -13,6 +13,7 @@ router.post("/submit", async (req, res) => {
       portfolio,
       techStack,
       profileImage,
+      label
     } = req.body;
 
     // Create and save a new Profile
@@ -24,6 +25,7 @@ router.post("/submit", async (req, res) => {
       portfolio,
       techStack,
       profileImage,
+      label,
     });
 
     await newProfile.save();
