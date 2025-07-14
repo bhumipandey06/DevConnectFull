@@ -11,7 +11,7 @@ const ProfileDetails = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/form/${id}`);
+        const res = await fetch(`https://devconnect-backend-xvdx.onrender.com/api/form/${id}`);
         if (!res.ok) {
           const { message } = await res.json();
           throw new Error(message || "Failed to fetch");

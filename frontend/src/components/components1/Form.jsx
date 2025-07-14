@@ -105,7 +105,7 @@ const Form = ({
       if (selectedProfileId) {
         // 🔄 Update existing profile (NO PROMPT)
         const response = await fetch(
-          `http://localhost:5000/api/form/${selectedProfileId}`,
+          `https://devconnect-backend-xvdx.onrender.com/api/form/${selectedProfileId}`,
           {
             method: "PUT",
             headers: {
@@ -128,7 +128,7 @@ const Form = ({
 
       // 🔄 Refresh saved profiles
       const updatedProfilesResponse = await fetch(
-        "http://localhost:5000/api/form/profiles"
+        "https://devconnect-backend-xvdx.onrender.com/api/form/profiles"
       );
       const updated = await updatedProfilesResponse.json();
       if (updated.success) {
@@ -174,7 +174,7 @@ const Form = ({
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/form/submit", {
+      const response = await fetch("https://devconnect-backend-xvdx.onrender.com/api/form/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -188,7 +188,7 @@ const Form = ({
 
         // Refresh saved profiles
         const updatedProfiles = await fetch(
-          "http://localhost:5000/api/form/profiles"
+          "https://devconnect-backend-xvdx.onrender.com/api/form/profiles"
         );
         const data = await updatedProfiles.json();
         if (data.success) {
@@ -242,7 +242,7 @@ const Form = ({
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/form/${selectedProfileId}`,
+        `https://devconnect-backend-xvdx.onrender.com/api/form/${selectedProfileId}`,
         {
           method: "DELETE",
         }
@@ -258,7 +258,7 @@ const Form = ({
 
       // Refresh list
       const updatedProfilesRes = await fetch(
-        "http://localhost:5000/api/form/profiles"
+        "https://devconnect-backend-xvdx.onrender.com/api/form/profiles"
       );
       const updatedData = await updatedProfilesRes.json();
       setSavedProfiles(updatedData.data);

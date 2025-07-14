@@ -45,7 +45,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/form/profiles");
+        const res = await fetch("https://devconnect-backend-xvdx.onrender.com/api/form/profiles");
         const data = await res.json();
   
         if (data.success) {
