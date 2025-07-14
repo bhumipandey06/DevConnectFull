@@ -88,9 +88,9 @@ const Form = ({
       setError("Portfolio link must start with https://");
       return;
     }
-  
+
     setError(""); // Clear errors
-  
+
     const profileData = {
       name,
       bio,
@@ -100,7 +100,7 @@ const Form = ({
       techStack,
       profileImage,
     };
-  
+
     try {
       if (selectedProfileId) {
         // 🔄 Update existing profile (NO PROMPT)
@@ -125,7 +125,7 @@ const Form = ({
         alert("❌ Please use 'Save New Profile' to create a new profile.");
         return;
       }
-  
+
       // 🔄 Refresh saved profiles
       const updatedProfilesResponse = await fetch(
         "http://localhost:5000/api/form/profiles"
@@ -139,13 +139,12 @@ const Form = ({
       alert("❌ An error occurred while saving the profile.");
     }
   };
-  
 
   // create new profile
   const handleSaveAsNew = async () => {
     const profileLabel = prompt("Enter a name for this saved profile:");
     if (!profileLabel) return;
-  
+
     if (!name.trim()) {
       setError("Name is required.");
       return;
@@ -162,18 +161,18 @@ const Form = ({
       setError("Portfolio link must start with https://");
       return;
     }
-  
+
     const profileData = {
-      name,          // ✅ full name of user
+      name, // ✅ full name of user
       bio,
       github,
       linkedin,
       portfolio,
       techStack,
       profileImage,
-      label: profileLabel,  // ✅ label shown in dropdown
+      label: profileLabel, // ✅ label shown in dropdown
     };
-  
+
     try {
       const response = await fetch("http://localhost:5000/api/form/submit", {
         method: "POST",
@@ -182,11 +181,11 @@ const Form = ({
         },
         body: JSON.stringify(profileData),
       });
-  
+
       const result = await response.json();
       if (result.success) {
         alert("✅ Profile saved as new successfully!");
-  
+
         // Refresh saved profiles
         const updatedProfiles = await fetch(
           "http://localhost:5000/api/form/profiles"
@@ -203,7 +202,6 @@ const Form = ({
       alert("❌ Error saving new profile.");
     }
   };
-  
 
   // ✅ Unified load + select logic
   const handleSelectProfile = (e) => {
@@ -301,8 +299,8 @@ const Form = ({
             </option>
             {savedProfiles.map((profile) => (
               <option key={profile._id} value={profile._id}>
-              {profile.label || profile.name}
-            </option>
+                {profile.label || profile.name}
+              </option>
             ))}
           </select>
 
@@ -421,20 +419,15 @@ const Form = ({
 
       {/* 🔹 Actions */}
       <div className="flex flex-col sm:flex-row gap-3 mt-4">
-        <button
-          type="button"
-          onClick={() => {
-            if (!selectedProfileId) {
-              alert("Please select or save a profile first.");
-              return;
-            }
-            navigate(`/profile/${selectedProfileId}`);
-          }}
-          disabled={!selectedProfileId}
-          className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-        >
-          View My Profile
-        </button>
+        {selectedProfileId && (
+          <button
+            type="button"
+            onClick={() => navigate(`/profile/${selectedProfileId}`)}
+            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
+          >
+            View My Public Profile
+          </button>
+        )}
 
         <button
           type="button"
