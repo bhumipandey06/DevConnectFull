@@ -35,8 +35,14 @@ const ProfileDetails = () => {
   };
 
   if (error) {
-    return <p className="text-red-500 text-center mt-10">❌ {error}</p>;
+    return (
+      <div className="text-center mt-10">
+        <p className="text-red-500 text-lg font-medium">❌ {error}</p>
+        <p className="text-gray-500 mt-2">The profile you're looking for may have been deleted or doesn't exist.</p>
+      </div>
+    );
   }
+  
 
   if (!profile) {
     return <p className="text-gray-500 text-center mt-10">Loading profile...</p>;
